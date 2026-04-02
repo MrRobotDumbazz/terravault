@@ -1,0 +1,12 @@
+pub const DISPUTE_WINDOW_SECONDS: i64 = 172_800;    // 48 hours (milestone-level)
+pub const DAO_DISPUTE_DEADLINE_SECONDS: i64 = 259_200; // 72 hours (project-level DAO)
+pub const MIN_FUNDRAISE_DEADLINE_SECONDS: i64 = 604_800; // 7 days
+pub const MAX_MILESTONES: u8 = 10;
+pub const MAX_TRANSFER_FEE_BPS: u16 = 500; // 5%
+pub const ORACLE_UPDATE_TIMELOCK_SECONDS: i64 = 172_800; // 48 hours
+pub const USDC_DECIMALS: u8 = 6;
+pub const DISTRIBUTION_SCALE: u128 = 1_000_000_000_000; // 10^12 for fixed-point math
+pub const BASIS_POINTS_DIVISOR: u16 = 10_000;
+pub const MAX_METADATA_URI_LEN: usize = 128;
+pub const MAX_DESCRIPTION_LEN: usize = 64;
+pub const MAX_DISPUTE_REASON_LEN: usize = 128;

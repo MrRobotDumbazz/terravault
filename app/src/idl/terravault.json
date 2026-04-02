@@ -1,0 +1,2740 @@
+{
+  "address": "DoAFjsoY9Ws7ZTNCokpsYHyNho8Krj9nK5dQFCdgYQqM",
+  "metadata": {
+    "name": "terravault",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "activate_project",
+      "docs": [
+        "Transition Fundraising → Active once soft cap is reached.",
+        "Tokens become transferable on secondary markets after activation."
+      ],
+      "discriminator": [
+        237,
+        96,
+        65,
+        148,
+        226,
+        140,
+        89,
+        15
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "signer": true,
+          "relations": [
+            "project_state"
+          ]
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "add_milestone",
+      "docs": [
+        "Add a milestone to a Draft project.",
+        "Milestones must be added sequentially (index 0, 1, 2 …).",
+        "Sum of all milestone release_bps must equal 10_000 before start_fundraising."
+      ],
+      "discriminator": [
+        165,
+        18,
+        177,
+        128,
+        204,
+        172,
+        23,
+        249
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "project_state"
+          ]
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        },
+        {
+          "name": "milestone_record",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "AddMilestoneParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "buy_tokens",
+      "docs": [
+        "Investor purchases fractional tokens with USDC.",
+        "USDC is held in escrow vault; tokens represent ownership shares."
+      ],
+      "discriminator": [
+        189,
+        21,
+        230,
+        133,
+        247,
+        2,
+        110,
+        42
+      ],
+      "accounts": [
+        {
+          "name": "investor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        },
+        {
+          "name": "investor_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              },
+              {
+                "kind": "account",
+                "path": "investor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "escrow_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  115,
+                  99,
+                  114,
+                  111,
+                  119
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "investor_usdc_account",
+          "writable": true
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "cancel_fundraise",
+      "docs": [
+        "Cancel fundraising. Allowed when soft cap not met, or developer explicit cancel",
+        "before target is reached. After cancel, investors can call claim_refund."
+      ],
+      "discriminator": [
+        113,
+        95,
+        97,
+        178,
+        30,
+        39,
+        211,
+        190
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "signer": true,
+          "relations": [
+            "project_state"
+          ]
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_distribution",
+      "docs": [
+        "Token holder claims their proportional share of a distribution round.",
+        "Rounds must be claimed sequentially to prevent skip-and-claim exploits."
+      ],
+      "discriminator": [
+        204,
+        156,
+        94,
+        85,
+        2,
+        125,
+        232,
+        180
+      ],
+      "accounts": [
+        {
+          "name": "investor",
+          "signer": true
+        },
+        {
+          "name": "project_state"
+        },
+        {
+          "name": "investor_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              },
+              {
+                "kind": "account",
+                "path": "investor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "distribution_pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  116,
+                  114,
+                  105,
+                  98,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              },
+              {
+                "kind": "arg",
+                "path": "round"
+              }
+            ]
+          }
+        },
+        {
+          "name": "income_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  99,
+                  111,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "investor_usdc_account",
+          "writable": true
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "round",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "claim_refund",
+      "docs": [
+        "Investor reclaims USDC after fundraise is cancelled."
+      ],
+      "discriminator": [
+        15,
+        16,
+        30,
+        161,
+        255,
+        228,
+        97,
+        60
+      ],
+      "accounts": [
+        {
+          "name": "investor",
+          "signer": true
+        },
+        {
+          "name": "project_state"
+        },
+        {
+          "name": "investor_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              },
+              {
+                "kind": "account",
+                "path": "investor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "escrow_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  115,
+                  99,
+                  114,
+                  111,
+                  119
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "investor_usdc_account",
+          "writable": true
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deposit_income",
+      "docs": [
+        "Developer deposits rental income or sale proceeds for proportional distribution.",
+        "Creates a DistributionPool with a snapshot of circulating token supply."
+      ],
+      "discriminator": [
+        66,
+        49,
+        62,
+        47,
+        202,
+        55,
+        206,
+        18
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "project_state"
+          ]
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        },
+        {
+          "name": "distribution_pool",
+          "writable": true
+        },
+        {
+          "name": "income_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  99,
+                  111,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "developer_usdc_account",
+          "writable": true
+        },
+        {
+          "name": "project_token_mint",
+          "docs": [
+            "Project token mint — snapshot of supply taken here"
+          ]
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount_usdc",
+          "type": "u64"
+        },
+        {
+          "name": "source",
+          "type": {
+            "defined": {
+              "name": "DistributionSource"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "dispute_milestone",
+      "docs": [
+        "Token holder disputes a milestone proof during the dispute window."
+      ],
+      "discriminator": [
+        199,
+        209,
+        70,
+        146,
+        136,
+        43,
+        179,
+        41
+      ],
+      "accounts": [
+        {
+          "name": "investor",
+          "signer": true
+        },
+        {
+          "name": "project_state"
+        },
+        {
+          "name": "investor_position",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              },
+              {
+                "kind": "account",
+                "path": "investor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "milestone_record",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "milestone_index",
+          "type": "u8"
+        },
+        {
+          "name": "reason",
+          "type": {
+            "array": [
+              "u8",
+              128
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "execute_transfer_hook",
+      "docs": [
+        "Token-2022 TransferHook entry point.",
+        "Called automatically by the Token-2022 program on every project token transfer.",
+        "Updates InvestorPosition.tokens_held for both parties."
+      ],
+      "discriminator": [
+        120,
+        157,
+        67,
+        141,
+        88,
+        144,
+        143,
+        220
+      ],
+      "accounts": [
+        {
+          "name": "source_token"
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "destination_token"
+        },
+        {
+          "name": "authority"
+        },
+        {
+          "name": "extra_account_meta_list",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  114,
+                  97,
+                  45,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  45,
+                  109,
+                  101,
+                  116,
+                  97,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "source_position",
+          "docs": [
+            "Sender's InvestorPosition — optional because sender may not have a position",
+            "(e.g. the program itself during mint/burn operations)"
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "destination_position",
+          "docs": [
+            "Receiver's InvestorPosition — optional for same reason"
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_project",
+      "docs": [
+        "Create a new real estate project (Residential / Commercial / Agricultural).",
+        "Initialises ProjectState PDA, TokenConfig PDA, and USDC escrow vault.",
+        "Project starts in Draft state; milestones must be added before fundraising."
+      ],
+      "discriminator": [
+        69,
+        126,
+        215,
+        37,
+        20,
+        60,
+        73,
+        235
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "project_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  106,
+                  101,
+                  99,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "developer"
+              },
+              {
+                "kind": "arg",
+                "path": "params.project_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "escrow_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  115,
+                  99,
+                  114,
+                  111,
+                  119
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "InitializeProjectParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pause_project",
+      "docs": [
+        "Emergency pause — freezes all state-mutating operations."
+      ],
+      "discriminator": [
+        8,
+        68,
+        240,
+        82,
+        45,
+        162,
+        129,
+        230
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "signer": true,
+          "relations": [
+            "project_state"
+          ]
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "release_milestone_funds",
+      "docs": [
+        "Oracle releases escrowed USDC to developer after dispute window elapses.",
+        "Final milestone transitions project → Completed."
+      ],
+      "discriminator": [
+        44,
+        226,
+        97,
+        240,
+        228,
+        187,
+        163,
+        115
+      ],
+      "accounts": [
+        {
+          "name": "oracle_authority",
+          "signer": true
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        },
+        {
+          "name": "milestone_record",
+          "writable": true
+        },
+        {
+          "name": "escrow_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  115,
+                  99,
+                  114,
+                  111,
+                  119
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "developer_usdc_account",
+          "writable": true
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "milestone_index",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "resolve_dispute",
+      "docs": [
+        "Arbitration authority resolves a disputed milestone.",
+        "approved=true: re-opens for release. approved=false: developer must resubmit."
+      ],
+      "discriminator": [
+        231,
+        6,
+        202,
+        6,
+        96,
+        103,
+        12,
+        230
+      ],
+      "accounts": [
+        {
+          "name": "arbitration_authority",
+          "docs": [
+            "Arbitration authority — multisig in production. Set per-project at init",
+            "or use a protocol-wide governance key stored in a separate ProtocolConfig PDA."
+          ],
+          "signer": true
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        },
+        {
+          "name": "milestone_record",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "milestone_index",
+          "type": "u8"
+        },
+        {
+          "name": "approved",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "start_fundraising",
+      "docs": [
+        "Transition project from Draft → Fundraising.",
+        "Requires all milestones added and total release_bps == 10_000."
+      ],
+      "discriminator": [
+        170,
+        184,
+        53,
+        170,
+        93,
+        139,
+        0,
+        163
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "signer": true,
+          "relations": [
+            "project_state"
+          ]
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "submit_milestone_proof",
+      "docs": [
+        "Oracle submits construction milestone proof.",
+        "Opens a 48-hour dispute window before funds can be released."
+      ],
+      "discriminator": [
+        95,
+        246,
+        144,
+        35,
+        212,
+        197,
+        162,
+        197
+      ],
+      "accounts": [
+        {
+          "name": "oracle_authority",
+          "signer": true
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        },
+        {
+          "name": "milestone_record",
+          "writable": true
+        },
+        {
+          "name": "instructions_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "SubmitMilestoneProofParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "unpause_project",
+      "docs": [
+        "Remove emergency pause."
+      ],
+      "discriminator": [
+        65,
+        73,
+        219,
+        36,
+        147,
+        9,
+        150,
+        90
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "signer": true,
+          "relations": [
+            "project_state"
+          ]
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_oracle",
+      "docs": [
+        "Initiate a 48-hour timelock oracle key rotation.",
+        "Call again after timelock to finalise the rotation."
+      ],
+      "discriminator": [
+        112,
+        41,
+        209,
+        18,
+        248,
+        226,
+        252,
+        188
+      ],
+      "accounts": [
+        {
+          "name": "developer",
+          "signer": true,
+          "relations": [
+            "project_state"
+          ]
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_oracle",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "DistributionPool",
+      "discriminator": [
+        148,
+        80,
+        177,
+        38,
+        240,
+        42,
+        90,
+        237
+      ]
+    },
+    {
+      "name": "InvestorPosition",
+      "discriminator": [
+        145,
+        143,
+        236,
+        150,
+        229,
+        40,
+        195,
+        88
+      ]
+    },
+    {
+      "name": "MilestoneRecord",
+      "discriminator": [
+        251,
+        118,
+        88,
+        101,
+        199,
+        181,
+        221,
+        85
+      ]
+    },
+    {
+      "name": "ProjectState",
+      "discriminator": [
+        41,
+        49,
+        200,
+        239,
+        125,
+        191,
+        219,
+        242
+      ]
+    },
+    {
+      "name": "TokenConfig",
+      "discriminator": [
+        92,
+        73,
+        255,
+        43,
+        107,
+        51,
+        117,
+        101
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "DisputeResolved",
+      "discriminator": [
+        121,
+        64,
+        249,
+        153,
+        139,
+        128,
+        236,
+        187
+      ]
+    },
+    {
+      "name": "DistributionClaimed",
+      "discriminator": [
+        28,
+        224,
+        98,
+        55,
+        240,
+        215,
+        209,
+        4
+      ]
+    },
+    {
+      "name": "FundraiseCancelled",
+      "discriminator": [
+        239,
+        148,
+        252,
+        202,
+        108,
+        113,
+        153,
+        128
+      ]
+    },
+    {
+      "name": "FundraisingStarted",
+      "discriminator": [
+        230,
+        222,
+        195,
+        73,
+        236,
+        162,
+        252,
+        14
+      ]
+    },
+    {
+      "name": "IncomeDeposited",
+      "discriminator": [
+        117,
+        173,
+        85,
+        100,
+        89,
+        111,
+        186,
+        125
+      ]
+    },
+    {
+      "name": "MilestoneDisputed",
+      "discriminator": [
+        83,
+        106,
+        229,
+        228,
+        159,
+        61,
+        122,
+        16
+      ]
+    },
+    {
+      "name": "MilestoneFundsReleased",
+      "discriminator": [
+        222,
+        23,
+        250,
+        143,
+        182,
+        152,
+        202,
+        77
+      ]
+    },
+    {
+      "name": "MilestoneProofSubmitted",
+      "discriminator": [
+        207,
+        247,
+        103,
+        220,
+        160,
+        162,
+        65,
+        252
+      ]
+    },
+    {
+      "name": "OracleUpdated",
+      "discriminator": [
+        138,
+        9,
+        51,
+        219,
+        228,
+        198,
+        11,
+        147
+      ]
+    },
+    {
+      "name": "ProjectActivated",
+      "discriminator": [
+        210,
+        196,
+        187,
+        6,
+        19,
+        113,
+        130,
+        167
+      ]
+    },
+    {
+      "name": "ProjectCompleted",
+      "discriminator": [
+        114,
+        254,
+        117,
+        239,
+        244,
+        178,
+        174,
+        211
+      ]
+    },
+    {
+      "name": "ProjectCreated",
+      "discriminator": [
+        192,
+        10,
+        163,
+        29,
+        185,
+        31,
+        67,
+        168
+      ]
+    },
+    {
+      "name": "ProjectPaused",
+      "discriminator": [
+        126,
+        250,
+        145,
+        29,
+        201,
+        145,
+        236,
+        173
+      ]
+    },
+    {
+      "name": "ProjectUnpaused",
+      "discriminator": [
+        116,
+        235,
+        152,
+        198,
+        226,
+        132,
+        178,
+        188
+      ]
+    },
+    {
+      "name": "RefundClaimed",
+      "discriminator": [
+        136,
+        64,
+        242,
+        99,
+        4,
+        244,
+        208,
+        130
+      ]
+    },
+    {
+      "name": "TokensPurchased",
+      "discriminator": [
+        214,
+        119,
+        105,
+        186,
+        114,
+        205,
+        228,
+        181
+      ]
+    },
+    {
+      "name": "TokensTransferred",
+      "discriminator": [
+        140,
+        86,
+        106,
+        38,
+        85,
+        157,
+        202,
+        250
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidProjectState",
+      "msg": "Invalid project state for this operation"
+    },
+    {
+      "code": 6001,
+      "name": "ProjectPaused",
+      "msg": "Project is paused"
+    },
+    {
+      "code": 6002,
+      "name": "FundraisingDeadlineNotPassed",
+      "msg": "Fundraising deadline has not passed yet"
+    },
+    {
+      "code": 6003,
+      "name": "FundraisingDeadlinePassed",
+      "msg": "Fundraising deadline has passed"
+    },
+    {
+      "code": 6004,
+      "name": "FundraisingTargetNotReached",
+      "msg": "Fundraising target not reached"
+    },
+    {
+      "code": 6005,
+      "name": "HardCapExceeded",
+      "msg": "Hard cap exceeded"
+    },
+    {
+      "code": 6006,
+      "name": "ZeroTokenAmount",
+      "msg": "Token amount must be greater than zero"
+    },
+    {
+      "code": 6007,
+      "name": "InsufficientFundraiseDuration",
+      "msg": "Insufficient fundraise deadline (min 7 days)"
+    },
+    {
+      "code": 6008,
+      "name": "MilestoneIndexOutOfBounds",
+      "msg": "Milestone index out of bounds"
+    },
+    {
+      "code": 6009,
+      "name": "NotCurrentMilestone",
+      "msg": "Not the current active milestone"
+    },
+    {
+      "code": 6010,
+      "name": "MilestoneBpsOverflow",
+      "msg": "Milestone release basis points would exceed 10000"
+    },
+    {
+      "code": 6011,
+      "name": "MilestoneBpsNotComplete",
+      "msg": "Total milestone basis points must equal 10000 to start fundraising"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidMilestoneStatus",
+      "msg": "Milestone is not in the expected status"
+    },
+    {
+      "code": 6013,
+      "name": "DisputeWindowActive",
+      "msg": "Dispute window has not elapsed"
+    },
+    {
+      "code": 6014,
+      "name": "DisputeWindowExpired",
+      "msg": "Dispute deadline has passed"
+    },
+    {
+      "code": 6015,
+      "name": "MilestonesIncomplete",
+      "msg": "Not all milestones have been added"
+    },
+    {
+      "code": 6016,
+      "name": "KycRequired",
+      "msg": "KYC verification required to invest"
+    },
+    {
+      "code": 6017,
+      "name": "KycNotVerified",
+      "msg": "Investor is not KYC verified"
+    },
+    {
+      "code": 6018,
+      "name": "InvalidOracle",
+      "msg": "Signer is not the oracle authority"
+    },
+    {
+      "code": 6019,
+      "name": "InvalidOracleSignature",
+      "msg": "Invalid oracle signature"
+    },
+    {
+      "code": 6020,
+      "name": "OracleTimelockActive",
+      "msg": "Oracle update timelock not elapsed"
+    },
+    {
+      "code": 6021,
+      "name": "NoTokensHeld",
+      "msg": "No tokens held to claim distribution"
+    },
+    {
+      "code": 6022,
+      "name": "DistributionAlreadyClaimed",
+      "msg": "Distribution round already claimed"
+    },
+    {
+      "code": 6023,
+      "name": "DistributionRoundSkipped",
+      "msg": "Must claim rounds in order"
+    },
+    {
+      "code": 6024,
+      "name": "ZeroDistributionAmount",
+      "msg": "Distribution amount must be greater than zero"
+    },
+    {
+      "code": 6025,
+      "name": "TransferFeeTooHigh",
+      "msg": "Transfer fee basis points exceed maximum (500 bps)"
+    },
+    {
+      "code": 6026,
+      "name": "MathOverflow",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6027,
+      "name": "DivisionByZero",
+      "msg": "Division by zero"
+    },
+    {
+      "code": 6028,
+      "name": "InvalidDeveloper",
+      "msg": "Signer is not the developer"
+    },
+    {
+      "code": 6029,
+      "name": "InvalidArbitrationAuthority",
+      "msg": "Signer is not the arbitration authority"
+    },
+    {
+      "code": 6030,
+      "name": "NoInvestmentToRefund",
+      "msg": "No investment to refund"
+    },
+    {
+      "code": 6031,
+      "name": "InvalidProofHash",
+      "msg": "Proof hash cannot be all zeros"
+    },
+    {
+      "code": 6032,
+      "name": "MetadataUriTooLong",
+      "msg": "Metadata URI too long"
+    }
+  ],
+  "types": [
+    {
+      "name": "AddMilestoneParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "milestone_type",
+            "type": {
+              "defined": {
+                "name": "MilestoneType"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "release_bps",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisputeResolved",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "milestone_index",
+            "type": "u8"
+          },
+          {
+            "name": "approved",
+            "type": "bool"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DistributionClaimed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "investor",
+            "type": "pubkey"
+          },
+          {
+            "name": "round",
+            "type": "u32"
+          },
+          {
+            "name": "amount_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DistributionPool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "round",
+            "type": "u32"
+          },
+          {
+            "name": "total_usdc_deposited",
+            "type": "u64"
+          },
+          {
+            "name": "total_tokens_at_snapshot",
+            "type": "u64"
+          },
+          {
+            "name": "usdc_per_token_scaled",
+            "docs": [
+              "Fixed-point: (total_usdc * 10^12) / total_tokens"
+            ],
+            "type": "u128"
+          },
+          {
+            "name": "deposited_at",
+            "type": "i64"
+          },
+          {
+            "name": "source",
+            "type": {
+              "defined": {
+                "name": "DistributionSource"
+              }
+            }
+          },
+          {
+            "name": "claim_deadline",
+            "docs": [
+              "0 = no expiry"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "total_claimed",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DistributionSource",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RentalIncome"
+          },
+          {
+            "name": "SaleProceeds"
+          },
+          {
+            "name": "Refinancing"
+          },
+          {
+            "name": "Other"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FundraiseCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_raised",
+            "type": "u64"
+          },
+          {
+            "name": "reason",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FundraisingStarted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "fundraise_target",
+            "type": "u64"
+          },
+          {
+            "name": "hard_cap",
+            "type": "u64"
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "IncomeDeposited",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "round",
+            "type": "u32"
+          },
+          {
+            "name": "amount_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "total_tokens_snapshot",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeProjectParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project_id",
+            "type": "u64"
+          },
+          {
+            "name": "project_type",
+            "type": {
+              "defined": {
+                "name": "ProjectType"
+              }
+            }
+          },
+          {
+            "name": "total_tokens",
+            "type": "u64"
+          },
+          {
+            "name": "token_price_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "fundraise_target_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "fundraise_hard_cap_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "fundraise_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "milestone_count",
+            "type": "u8"
+          },
+          {
+            "name": "metadata_uri",
+            "type": "bytes"
+          },
+          {
+            "name": "legal_doc_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "oracle_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "kyc_required",
+            "type": "bool"
+          },
+          {
+            "name": "transfer_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "fee_destination",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InvestorPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "investor",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokens_held",
+            "type": "u64"
+          },
+          {
+            "name": "usdc_invested",
+            "type": "u64"
+          },
+          {
+            "name": "last_claimed_round",
+            "type": "u32"
+          },
+          {
+            "name": "total_claimed_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "kyc_verified",
+            "type": "bool"
+          },
+          {
+            "name": "kyc_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MilestoneDisputed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "milestone_index",
+            "type": "u8"
+          },
+          {
+            "name": "investor",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MilestoneFundsReleased",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "milestone_index",
+            "type": "u8"
+          },
+          {
+            "name": "amount_released",
+            "type": "u64"
+          },
+          {
+            "name": "developer",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MilestoneProofSubmitted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "milestone_index",
+            "type": "u8"
+          },
+          {
+            "name": "proof_uri",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "proof_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "dispute_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MilestoneRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "milestone_index",
+            "type": "u8"
+          },
+          {
+            "name": "milestone_type",
+            "type": {
+              "defined": {
+                "name": "MilestoneType"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "release_bps",
+            "type": "u16"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "MilestoneStatus"
+              }
+            }
+          },
+          {
+            "name": "proof_uri",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "proof_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "submitted_at",
+            "type": "i64"
+          },
+          {
+            "name": "approved_at",
+            "type": "i64"
+          },
+          {
+            "name": "released_amount_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "oracle_signature",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "dispute_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MilestoneStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "UnderReview"
+          },
+          {
+            "name": "Approved"
+          },
+          {
+            "name": "Released"
+          },
+          {
+            "name": "Disputed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MilestoneType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SitePreparation"
+          },
+          {
+            "name": "Foundation"
+          },
+          {
+            "name": "Framing"
+          },
+          {
+            "name": "Roofing"
+          },
+          {
+            "name": "MEP"
+          },
+          {
+            "name": "InteriorWork"
+          },
+          {
+            "name": "Landscaping"
+          },
+          {
+            "name": "Completion"
+          },
+          {
+            "name": "Custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OracleUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_oracle",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_oracle",
+            "type": "pubkey"
+          },
+          {
+            "name": "effective_at",
+            "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectActivated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_raised",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectCompleted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "developer",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "developer",
+            "type": "pubkey"
+          },
+          {
+            "name": "project_id",
+            "type": "u64"
+          },
+          {
+            "name": "total_tokens",
+            "type": "u64"
+          },
+          {
+            "name": "token_price_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectPaused",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project_id",
+            "type": "u64"
+          },
+          {
+            "name": "developer",
+            "type": "pubkey"
+          },
+          {
+            "name": "oracle_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "escrow_vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "ProjectStatus"
+              }
+            }
+          },
+          {
+            "name": "project_type",
+            "type": {
+              "defined": {
+                "name": "ProjectType"
+              }
+            }
+          },
+          {
+            "name": "total_tokens",
+            "type": "u64"
+          },
+          {
+            "name": "tokens_sold",
+            "type": "u64"
+          },
+          {
+            "name": "token_price_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "fundraise_target_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "fundraise_hard_cap_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "fundraise_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "escrow_balance_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "total_raised_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "milestone_count",
+            "type": "u8"
+          },
+          {
+            "name": "milestones_added",
+            "type": "u8"
+          },
+          {
+            "name": "milestones_completed",
+            "type": "u8"
+          },
+          {
+            "name": "current_milestone_index",
+            "type": "u8"
+          },
+          {
+            "name": "milestone_bps_total",
+            "type": "u16"
+          },
+          {
+            "name": "distribution_round",
+            "type": "u32"
+          },
+          {
+            "name": "total_distributed_usdc",
+            "type": "u64"
+          },
+          {
+            "name": "metadata_uri",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "legal_doc_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "oracle_update_pending_at",
+            "type": "i64"
+          },
+          {
+            "name": "pending_oracle",
+            "type": "pubkey"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "escrow_bump",
+            "type": "u8"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "kyc_required",
+            "type": "bool"
+          },
+          {
+            "name": "transfer_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Draft"
+          },
+          {
+            "name": "Fundraising"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "InMilestones"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Distributing"
+          },
+          {
+            "name": "Closed"
+          },
+          {
+            "name": "Cancelled"
+          },
+          {
+            "name": "Paused"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Residential"
+          },
+          {
+            "name": "Commercial"
+          },
+          {
+            "name": "Agricultural"
+          },
+          {
+            "name": "Mixed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectUnpaused",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RefundClaimed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "investor",
+            "type": "pubkey"
+          },
+          {
+            "name": "usdc_refunded",
+            "type": "u64"
+          },
+          {
+            "name": "tokens_burned",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubmitMilestoneProofParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "milestone_index",
+            "type": "u8"
+          },
+          {
+            "name": "proof_uri",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "proof_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "oracle_sig",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "transfer_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "transfer_fee_max_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "fee_destination",
+            "type": "pubkey"
+          },
+          {
+            "name": "interest_rate_bps",
+            "docs": [
+              "Nominal interest rate in bps for display purposes (0 = none)"
+            ],
+            "type": "i16"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokensPurchased",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "investor",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_amount",
+            "type": "u64"
+          },
+          {
+            "name": "usdc_paid",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokensTransferred",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "from",
+            "type": "pubkey"
+          },
+          {
+            "name": "to",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}
