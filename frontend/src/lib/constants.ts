@@ -2,7 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 
 // Replace with actual program ID after `anchor build && anchor deploy`
 export const PROGRAM_ID = new PublicKey(
-  "DoAFjsoY9Ws7ZTNCokpsYHyNho8Krj9nK5dQFCdgYQqM"
+  "FpknHE4LQu9etCmFgcmJmS3hURrrSNiDNs2qxasSmAT8"
 );
 
 // USDC mint addresses

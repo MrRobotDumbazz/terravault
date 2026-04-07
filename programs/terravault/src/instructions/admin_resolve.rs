@@ -7,7 +7,7 @@ use crate::{
 
 /// Admin multisig pubkey — replace with actual 2/3 multisig address before mainnet.
 /// On devnet this is a single authority key set at deploy time via env.
-pub const ADMIN_PUBKEY: Pubkey = solana_program::pubkey!("11111111111111111111111111111111");
+pub const ADMIN_PUBKEY: Pubkey = anchor_lang::pubkey!("11111111111111111111111111111111");
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq, Debug)]
 pub enum ResolutionDecision {

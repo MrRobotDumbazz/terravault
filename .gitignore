@@ -1,0 +1,47 @@
+# Rust / Anchor
+target/
+**/*.rs.bk
+.anchor/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Go
+backend/tmp/
+backend/*.exe
+
+# Environment — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# Solana keypairs — NEVER commit
+**/*-keypair.json
+deploy-keypair.json
+wallet.json
+
+# Anchor build artifacts (keep .so out of repo)
+target/deploy/*.so
+target/idl/
+target/types/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Playwright
+.playwright-mcp/

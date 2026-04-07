@@ -158,14 +158,14 @@ pub fn handler(ctx: Context<InitializeProject>, params: InitializeProjectParams)
     project.paused = false;
     project.kyc_required = params.kyc_required;
     project.transfer_fee_bps = params.transfer_fee_bps;
-    project.reserved = [0u8; 64];
+    project.reserved = [0u8; 23];
 
     // Initialise DeveloperProfile on first project (init_if_needed zeroes it, so only set
     // non-zero fields when developer field is default/empty).
     let dev_profile = &mut ctx.accounts.developer_profile;
     if dev_profile.developer == Pubkey::default() {
         dev_profile.developer = ctx.accounts.developer.key();
-        dev_profile.bump = ctx.bumps.developer_profile;
+        dev_profile.bump = bumps.developer_profile;
     }
     dev_profile.total_projects = dev_profile.total_projects.saturating_add(1);
 

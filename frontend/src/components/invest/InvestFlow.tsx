@@ -7,6 +7,7 @@ import { useWalletStore } from "@/store/wallet";
 import type { ApiProject } from "@/types/project";
 import { PROGRAM_ID, USDC_MINT } from "@/lib/constants";
 import { getInvestorPositionPDA, getEscrowVaultPDA } from "@/lib/pda";
+import { parseTransactionError } from "@/lib/errors";
 import IDL from "@/idl/terravault.json";
 
 type Step = "check" | "amount" | "confirm" | "done";
@@ -50,7 +51,7 @@ export default function InvestFlow({ project, onClose }: Props) {
       // Build instruction via Anchor
       const provider = new anchor.AnchorProvider(
         connection,
-        { publicKey, signTransaction: signTransaction!, signAllTransactions: async (txs) => txs } as any,
+        { publicKey, signTransaction: signTransaction!, signAllTransactions: async (txs: any[]) => txs } as any,
         { commitment: "confirmed" }
       );
       const program = new anchor.Program(IDL as anchor.Idl, provider);
@@ -80,8 +81,7 @@ export default function InvestFlow({ project, onClose }: Props) {
       setTxSig(sig);
       setStep("done");
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      setError(msg.slice(0, 120));
+      setError(parseTransactionError(e));
       setStep("amount");
     } finally {
       setLoading(false);

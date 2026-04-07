@@ -1,5 +1,5 @@
 {
-  "address": "DoAFjsoY9Ws7ZTNCokpsYHyNho8Krj9nK5dQFCdgYQqM",
+  "address": "FpknHE4LQu9etCmFgcmJmS3hURrrSNiDNs2qxasSmAT8",
   "metadata": {
     "name": "terravault",
     "version": "0.1.0",
@@ -82,6 +82,82 @@
           "type": {
             "defined": {
               "name": "AddMilestoneParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "admin_resolve",
+      "docs": [
+        "Admin multisig resolves a project dispute.",
+        "Decisions: PayInvestors | RefundAndExtend | ForceClose.",
+        "Transitions DisputeActive → Resolved."
+      ],
+      "discriminator": [
+        90,
+        215,
+        29,
+        95,
+        17,
+        61,
+        118,
+        229
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "docs": [
+            "Must be the protocol admin (multisig in production)."
+          ],
+          "signer": true
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        },
+        {
+          "name": "developer_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101,
+                  114,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state.developer",
+                "account": "ProjectState"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "decision",
+          "type": {
+            "defined": {
+              "name": "ResolutionDecision"
             }
           }
         }
@@ -700,6 +776,130 @@
       ]
     },
     {
+      "name": "flag_developer",
+      "docs": [
+        "Flag a developer as a bad actor. Sets is_blacklisted = true on DeveloperProfile.",
+        "Prevents future project creation by this developer."
+      ],
+      "discriminator": [
+        9,
+        119,
+        219,
+        124,
+        58,
+        223,
+        45,
+        162
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "admin_check"
+        },
+        {
+          "name": "developer_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101,
+                  114,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "developer_pubkey"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "developer_pubkey",
+          "type": "pubkey"
+        },
+        {
+          "name": "reason_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "freeze_developer",
+      "docs": [
+        "Freeze the developer's token account after PayInvestors decision.",
+        "Uses Token-2022 freeze authority held by the project_state PDA."
+      ],
+      "discriminator": [
+        15,
+        141,
+        80,
+        158,
+        185,
+        200,
+        43,
+        107
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "docs": [
+            "Admin authority — same check as admin_resolve."
+          ],
+          "signer": true
+        },
+        {
+          "name": "project_state"
+        },
+        {
+          "name": "developer_token_account",
+          "docs": [
+            "Developer's token account holding their collateral."
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_mint",
+          "docs": [
+            "The project token mint — must have freeze_authority set to project_state PDA."
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initialize_project",
       "docs": [
         "Create a new real estate project (Residential / Commercial / Agricultural).",
@@ -806,6 +1006,43 @@
           }
         },
         {
+          "name": "developer_profile",
+          "docs": [
+            "Developer profile PDA — created on first project, checked for blacklist on subsequent ones."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101,
+                  114,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "developer"
+              }
+            ]
+          }
+        },
+        {
           "name": "token_program",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
@@ -862,6 +1099,82 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "raise_dispute",
+      "docs": [
+        "Raise a project-level dispute. Transitions Active/InMilestones → DisputeActive.",
+        "Starts 72-hour resolution window."
+      ],
+      "discriminator": [
+        41,
+        243,
+        1,
+        51,
+        150,
+        95,
+        246,
+        73
+      ],
+      "accounts": [
+        {
+          "name": "caller",
+          "docs": [
+            "Either the developer or any token holder may raise a dispute."
+          ],
+          "signer": true
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        },
+        {
+          "name": "developer_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101,
+                  114,
+                  95,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "project_state.developer",
+                "account": "ProjectState"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "reason_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "release_milestone_funds",
@@ -1011,6 +1324,47 @@
       "args": []
     },
     {
+      "name": "submit_evidence",
+      "docs": [
+        "Submit IPFS evidence hash during the 72-hour dispute window.",
+        "Either party (developer or investor) may call this."
+      ],
+      "discriminator": [
+        12,
+        169,
+        228,
+        194,
+        229,
+        31,
+        44,
+        39
+      ],
+      "accounts": [
+        {
+          "name": "submitter",
+          "docs": [
+            "Developer or any investor may submit evidence during the dispute window."
+          ],
+          "signer": true
+        },
+        {
+          "name": "project_state",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "submit_milestone_proof",
       "docs": [
         "Oracle submits construction milestone proof.",
@@ -1124,6 +1478,19 @@
   ],
   "accounts": [
     {
+      "name": "DeveloperProfile",
+      "discriminator": [
+        124,
+        166,
+        166,
+        245,
+        18,
+        106,
+        19,
+        219
+      ]
+    },
+    {
       "name": "DistributionPool",
       "discriminator": [
         148,
@@ -1191,6 +1558,45 @@
   ],
   "events": [
     {
+      "name": "AdminResolved",
+      "discriminator": [
+        45,
+        1,
+        13,
+        51,
+        66,
+        27,
+        194,
+        199
+      ]
+    },
+    {
+      "name": "DeveloperFlagged",
+      "discriminator": [
+        2,
+        217,
+        73,
+        92,
+        15,
+        220,
+        141,
+        79
+      ]
+    },
+    {
+      "name": "DisputeRaised",
+      "discriminator": [
+        246,
+        167,
+        109,
+        37,
+        142,
+        45,
+        38,
+        176
+      ]
+    },
+    {
       "name": "DisputeResolved",
       "discriminator": [
         121,
@@ -1214,6 +1620,32 @@
         215,
         209,
         4
+      ]
+    },
+    {
+      "name": "EvidenceSubmitted",
+      "discriminator": [
+        13,
+        123,
+        197,
+        44,
+        231,
+        117,
+        168,
+        53
+      ]
+    },
+    {
+      "name": "FraudConfirmed",
+      "discriminator": [
+        153,
+        14,
+        23,
+        181,
+        88,
+        43,
+        74,
+        120
       ]
     },
     {
@@ -1577,6 +2009,36 @@
       "code": 6032,
       "name": "MetadataUriTooLong",
       "msg": "Metadata URI too long"
+    },
+    {
+      "code": 6033,
+      "name": "NotDisputable",
+      "msg": "Project is not in an active disputable state"
+    },
+    {
+      "code": 6034,
+      "name": "NotInDispute",
+      "msg": "Project is not in DisputeActive state"
+    },
+    {
+      "code": 6035,
+      "name": "DisputeExpired",
+      "msg": "Dispute resolution window has expired"
+    },
+    {
+      "code": 6036,
+      "name": "DisputeWindowStillOpen",
+      "msg": "Dispute resolution window is still open"
+    },
+    {
+      "code": 6037,
+      "name": "InvalidAdmin",
+      "msg": "Signer is not the admin authority"
+    },
+    {
+      "code": 6038,
+      "name": "DeveloperBlacklisted",
+      "msg": "Developer is blacklisted and cannot create new projects"
     }
   ],
   "types": [
@@ -1609,6 +2071,158 @@
           {
             "name": "release_bps",
             "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AdminDecision",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "PayInvestors"
+          },
+          {
+            "name": "RefundAndExtend"
+          },
+          {
+            "name": "ForceClose"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AdminResolved",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "decision",
+            "type": "u8"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeveloperFlagged",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "developer",
+            "type": "pubkey"
+          },
+          {
+            "name": "reason_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeveloperProfile",
+      "docs": [
+        "Per-developer reputation and blacklist record.",
+        "PDA seeds: [b\"developer_profile\", developer_pubkey]",
+        "Created on first project init; updated on milestone/dispute events."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "developer",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_projects",
+            "type": "u32"
+          },
+          {
+            "name": "completed_on_time",
+            "type": "u32"
+          },
+          {
+            "name": "disputes_raised",
+            "type": "u32"
+          },
+          {
+            "name": "disputes_lost",
+            "type": "u32"
+          },
+          {
+            "name": "is_blacklisted",
+            "type": "bool"
+          },
+          {
+            "name": "rating_score",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                29
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisputeRaised",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "raised_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "reason_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -1748,6 +2362,59 @@
           },
           {
             "name": "Other"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EvidenceSubmitted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "submitted_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "evidence_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FraudConfirmed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "pubkey"
+          },
+          {
+            "name": "developer",
+            "type": "pubkey"
+          },
+          {
+            "name": "collateral_distributed",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -2492,11 +3159,32 @@
             "type": "u16"
           },
           {
+            "name": "dispute_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "evidence_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "admin_decision",
+            "type": {
+              "defined": {
+                "name": "AdminDecision"
+              }
+            }
+          },
+          {
             "name": "reserved",
             "type": {
               "array": [
                 "u8",
-                64
+                23
               ]
             }
           }
@@ -2534,6 +3222,12 @@
           },
           {
             "name": "Paused"
+          },
+          {
+            "name": "DisputeActive"
+          },
+          {
+            "name": "Resolved"
           }
         ]
       }
@@ -2598,6 +3292,23 @@
           {
             "name": "timestamp",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResolutionDecision",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PayInvestors"
+          },
+          {
+            "name": "RefundAndExtend"
+          },
+          {
+            "name": "ForceClose"
           }
         ]
       }

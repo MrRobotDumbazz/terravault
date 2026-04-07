@@ -29,7 +29,7 @@ use instructions::freeze_developer::*;
 use instructions::flag_developer::*;
 use state::distribution::DistributionSource;
 
-declare_id!("DoAFjsoY9Ws7ZTNCokpsYHyNho8Krj9nK5dQFCdgYQqM");
+declare_id!("FpknHE4LQu9etCmFgcmJmS3hURrrSNiDNs2qxasSmAT8");
 
 #[program]
 pub mod terravault {

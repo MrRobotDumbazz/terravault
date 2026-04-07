@@ -58,7 +58,7 @@ export default function MilestoneTimeline({ milestones, currentIndex }: Props) {
 
             <div className="flex items-center gap-4 text-xs text-gray-500">
               <span>Release: {(m.releaseBps / 100).toFixed(0)}%</span>
-              {m.releasedAmountUsdc && (
+              {!!m.releasedAmountUsdc && (
                 <span className="text-green-400">
                   ${(Number(m.releasedAmountUsdc) / 1_000_000).toLocaleString()} released
                 </span>

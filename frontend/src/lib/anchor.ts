@@ -23,6 +23,6 @@ export function useProgram(idl: Idl) {
   const provider = useAnchorProvider();
   return useMemo(() => {
     if (!provider) return null;
-    return new Program(idl, PROGRAM_ID, provider);
+    return new Program(idl, provider);
   }, [provider, idl]);
 }

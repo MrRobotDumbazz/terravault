@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Transaction, VersionedTransaction } from "@solana/web3.js";
 import { useUIStore } from "@/store/ui";
+import { parseTransactionError } from "@/lib/errors";
 
 interface UseTransactionOptions {
   onSuccess?: (signature: string) => void;
@@ -55,11 +56,12 @@ export function useTransaction(options?: UseTransactionOptions) {
         options?.onSuccess?.(sig);
         return sig;
       } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
+        const message = parseTransactionError(err);
+        const error = err instanceof Error ? err : new Error(message);
         addToast({
           type: "error",
           title: "Transaction failed",
-          description: error.message,
+          description: message,
         });
         options?.onError?.(error);
         throw error;
