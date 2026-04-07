@@ -20,7 +20,7 @@
 | Name | Role | Contact |
 |------|------|---------|
 | Abay Mukhammetali | Founder & Lead Engineer | [Telegram](https://t.me/tallyhallfan#) |
-| Diana Kalieva | CTO & Backend developer | [Telegram](https://t.me/brewmountain
+| Diana Kalieva | CTO & Backend developer | [Telegram](https://t.me/brewmountain#) |
 
 ---
 
